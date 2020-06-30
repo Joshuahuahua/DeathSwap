@@ -1,0 +1,9 @@
+name: DeathSwap
+author: Joshalot
+main: com.github.joshuahuahua.DeathSwap.Main
+version: 1.0
+description: B R U H
+
+commands:
+  Deathswap:
+    aliases: ds
