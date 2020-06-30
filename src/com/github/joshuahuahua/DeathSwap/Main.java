@@ -1,6 +1,7 @@
 package com.github.joshuahuahua.DeathSwap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -8,6 +9,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public class Main extends JavaPlugin {
+
+    
 
     @Override
     public void onEnable() {
@@ -72,19 +75,19 @@ public class Main extends JavaPlugin {
                 }
             }
 
-
             if (args.length == 1 && args[0].equalsIgnoreCase("start")) {
                 Bukkit.broadcastMessage("DeathSwap Started");
                 BukkitScheduler scheduler = getServer().getScheduler();
                 timer = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
                     @Override
                     public void run() {
-                        Bukkit.broadcastMessage("bruh2");
+                        Location player1pos = player1.getLocation();
+                        Location player2pos = player2.getLocation();
+                        player1.teleport(player2pos);
+                        player2.teleport(player1pos);
                     }
                 },20*time, 20*time);
             }
-
-
 
             if (args.length == 1 && args[0].equalsIgnoreCase("stop")) {
                 Bukkit.getScheduler().cancelTask(timer);
