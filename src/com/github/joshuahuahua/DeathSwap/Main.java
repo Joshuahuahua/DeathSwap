@@ -79,7 +79,7 @@ public class Main extends JavaPlugin {
                 timer = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
                     @Override
                     public void run() {
-                        Bukkit.broadcastMessage("bruh");
+                        Bukkit.broadcastMessage("bruh2");
                     }
                 },20*time, 20*time);
             }
