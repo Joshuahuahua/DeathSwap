@@ -18,11 +18,20 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 public class Main extends JavaPlugin implements Listener {
 
+    Player player1 = null;
+    Player player2 = null;
+    int time = 3;
+    int timer;
+    int countDown;
+    int secondsRemaining;
+    boolean isRunning;
+
     @Override
     public void onEnable() {
         this.getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("DeathSwap Enabled");
     }
+
     @Override
     public void onDisable() {
         getLogger().info("DeathSwap Disabled");
@@ -55,14 +64,6 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
     }
-
-    Player player1 = null;
-    Player player2 = null;
-    int time = 3;
-    int timer;
-    int countDown;
-    int secondsRemaining;
-    boolean isRunning;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -153,6 +154,7 @@ public class Main extends JavaPlugin implements Listener {
                         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap Started"));
                         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$cSwap time minutes: " + time));
                         BukkitScheduler scheduler = getServer().getScheduler();
+
                         timer = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
                             @Override
                             public void run() {
@@ -199,8 +201,6 @@ public class Main extends JavaPlugin implements Listener {
                     sender.sendMessage("No active Death Swap!");
                 }
             }
-
-
 
             return true;
         }
