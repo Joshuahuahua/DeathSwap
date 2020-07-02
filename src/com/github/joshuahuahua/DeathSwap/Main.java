@@ -16,6 +16,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
+//#####################################  INIT  ##########################################################
+
 public class Main extends JavaPlugin implements Listener {
 
     Player player1 = null;
@@ -37,6 +39,9 @@ public class Main extends JavaPlugin implements Listener {
         getLogger().info("DeathSwap Disabled");
     }
 
+
+    //######################################## On join #########################################################
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$c$lWelcome to DeathSwap"));
@@ -46,6 +51,9 @@ public class Main extends JavaPlugin implements Listener {
         event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$aUsage: ds start"));
         event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$aUsage: ds stop"));
     }
+
+
+    //######################################## On Death #########################################################
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
@@ -65,6 +73,8 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
+    //######################################## On command #########################################################
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (label.equalsIgnoreCase("DeathSwap") || label.equalsIgnoreCase("ds")) {
@@ -72,14 +82,20 @@ public class Main extends JavaPlugin implements Listener {
                 sender.sendMessage("BRUH");
             }
 
+            //################################# /ds ################################
+
             if (args.length == 0) {
-                sender.sendMessage("Usage: ds <player1> <player2>");
+                sender.sendMessage("Usage: ds set <player1> <player2>...");
                 sender.sendMessage("Usage: ds clear");
-                sender.sendMessage("Usage: ds settime <num>");
+                sender.sendMessage("Usage: ds timeset <num>");
                 sender.sendMessage("Usage: ds start");
                 sender.sendMessage("Usage: ds stop");
             }
-            // ds p1/p2
+
+            //############################# 1 perameter ##############################
+
+            //############################## /ds p1/p2 ################################
+
             if (args.length == 1 && args[0].equalsIgnoreCase("p1")) {
                 if (player1 != null) {
                     sender.sendMessage("Set player1 to " + player1.getName());
@@ -95,17 +111,37 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
 
+            //############################## /ds stop ################################
+            if (args.length == 1 && args[0].equalsIgnoreCase("stop")) {
+                if (isRunning) {
+                    isRunning = false;
+                    Bukkit.getScheduler().cancelTask(timer);
+                    Bukkit.getScheduler().cancelTask(countDown);
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap Stopped"));
+                } else {
+                    sender.sendMessage("No active Death Swap!");
+                }
+            }
+
+            //############################### /ds clear ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("clear")) {
                 player1 = null;
                 player2 = null;
                 sender.sendMessage("Cleared players");
             }
 
+
+            //############################# 2 perameters ################################
+
+
             if (args.length == 2) {
-                if (args[0].equals("settime")) {
+                if (args[0].equals("timeset")) {
                     time = Integer.parseInt(args[1]);
                     sender.sendMessage("Set time to " + time);
-                } else {
+                }
+            }
+            if (args.length == 3){
+                if (args[0].equals("timeset")) {
                     player1 = Bukkit.getPlayerExact(args[0]);
                     player2 = Bukkit.getPlayerExact(args[1]);
                     if (player1 != null && player2 != null && player1 != player2) {
@@ -118,7 +154,11 @@ public class Main extends JavaPlugin implements Listener {
                     }
                 }
             }
-            //START
+
+
+
+
+            //############################# START ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("start")) {
                 if (player1 != null && player2 != null) {
                     if (!isRunning) {
@@ -191,16 +231,7 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
 
-            if (args.length == 1 && args[0].equalsIgnoreCase("stop")) {
-                if (isRunning) {
-                    isRunning = false;
-                    Bukkit.getScheduler().cancelTask(timer);
-                    Bukkit.getScheduler().cancelTask(countDown);
-                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap Stopped"));
-                } else {
-                    sender.sendMessage("No active Death Swap!");
-                }
-            }
+
 
             return true;
         }
