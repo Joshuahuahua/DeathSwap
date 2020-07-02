@@ -11,10 +11,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 //#####################################  INIT  ##########################################################
 
@@ -22,11 +27,13 @@ public class Main extends JavaPlugin implements Listener {
 
     Player player1 = null;
     Player player2 = null;
-    int time = 3;
+    int time = 1;
     int timer;
     int countDown;
     int secondsRemaining;
     boolean isRunning;
+    List<Player> players = new ArrayList<>();
+
 
     @Override
     public void onEnable() {
@@ -46,10 +53,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$c$lWelcome to DeathSwap"));
         event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$cBy Joshalot and Nel"));
-        event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$aUsage: ds <player1> <player2>"));
-        event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$aUsage: ds clear"));
-        event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$aUsage: ds start"));
-        event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$aUsage: ds stop"));
+        event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('$',"$aUse /ds help for available commands!"));
     }
 
 
@@ -58,17 +62,28 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         if (isRunning) {
-            isRunning = false;
-            player1.setGameMode(GameMode.SPECTATOR);
-            player2.setGameMode(GameMode.SPECTATOR);
+            int i;
+            for (i = 0; i < players.size(); i++) {
+                if (players.get(i).getName().equals(event.getEntity().getName())) {
+                    event.getEntity().setGameMode(GameMode.SPECTATOR);
+                    players.remove(i);
+                }
+            }
+            if (players.size() == 1) {
+                isRunning = false;
+                Bukkit.getScheduler().cancelTask(timer);
+                Bukkit.getScheduler().cancelTask(countDown);
 
-            Bukkit.getScheduler().cancelTask(timer);
-            Bukkit.getScheduler().cancelTask(countDown);
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap has ended"));
-            if (event.getEntity().getName().equals(player1.getName())) {
-                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c" + player2.getName() + " $fis the winner!"));
+                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap has ended"));
+                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$a" + players.get(0).getName() + " $fis the winner!"));
+
+                players.get(0).sendMessage(ChatColor.translateAlternateColorCodes('$',"$d$lYou are the winner!"));
+                players.get(0).sendMessage(ChatColor.translateAlternateColorCodes('$',"$dHave some cake :)"));
+                players.get(0).getInventory().clear();
+                players.get(0).getInventory().addItem(new ItemStack(Material.CAKE, 1));
             } else {
-                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c" + player1.getName() + " $fis the winner!"));
+                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$l" + event.getEntity().getName() + " has died!"));
+                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$l" + players.size() + " players remaining."));
             }
         }
     }
@@ -83,8 +98,7 @@ public class Main extends JavaPlugin implements Listener {
             }
 
             //################################# /ds ################################
-
-            if (args.length == 0) {
+            if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
                 sender.sendMessage("Usage: ds set <player1> <player2>...");
                 sender.sendMessage("Usage: ds clear");
                 sender.sendMessage("Usage: ds timeset <num>");
@@ -92,26 +106,12 @@ public class Main extends JavaPlugin implements Listener {
                 sender.sendMessage("Usage: ds stop");
             }
 
+
+
             //############################# 1 perameter ##############################
 
-            //############################## /ds p1/p2 ################################
-
-            if (args.length == 1 && args[0].equalsIgnoreCase("p1")) {
-                if (player1 != null) {
-                    sender.sendMessage("Set player1 to " + player1.getName());
-                } else {
-                    sender.sendMessage("That player has not been set.");
-                }
-            }
-            if (args.length == 1 && args[0].equalsIgnoreCase("p2")) {
-                if (player2 != null) {
-                    sender.sendMessage("Set player1 to " + player2.getName());
-                } else {
-                    sender.sendMessage("That player has not been set.");
-                }
-            }
-
             //############################## /ds stop ################################
+
             if (args.length == 1 && args[0].equalsIgnoreCase("stop")) {
                 if (isRunning) {
                     isRunning = false;
@@ -125,116 +125,132 @@ public class Main extends JavaPlugin implements Listener {
 
             //############################### /ds clear ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("clear")) {
-                player1 = null;
-                player2 = null;
+                players.clear();
                 sender.sendMessage("Cleared players");
             }
 
 
             //############################# 2 perameters ################################
 
+            //############################## /ds player/p <num> ################################
+            if (args.length == 2 && (args[0].equalsIgnoreCase("player") || args[0].equalsIgnoreCase("p"))) {
+                if (Integer.parseInt(args[1]) > players.size()) {
+                    sender.sendMessage("That player has not been set.");
+                } else {
+                    sender.sendMessage("Set player " + args[1] + " to " + players.get(Integer.parseInt(args[1])-1).getName());
+                }
+            }
 
+            //############################## /ds timeset <num> ################################
             if (args.length == 2) {
                 if (args[0].equals("timeset")) {
                     time = Integer.parseInt(args[1]);
                     sender.sendMessage("Set time to " + time);
                 }
             }
-            if (args.length == 3){
-                if (args[0].equals("timeset")) {
-                    player1 = Bukkit.getPlayerExact(args[0]);
-                    player2 = Bukkit.getPlayerExact(args[1]);
-                    if (player1 != null && player2 != null && player1 != player2) {
-                        sender.sendMessage("Set player1 to " + player1.getName());
-                        sender.sendMessage("Set player2 to " + player1.getName());
-                        player1.sendMessage("You have been set to player1");
-                        player2.sendMessage("You have been set to player2");
-                    } else {
-                        sender.sendMessage("Usage: ds <player1> <player2>");
+
+            //############################# 2+ perameters ################################
+
+            //############################## /ds set <player1> <player2>... ################################
+
+            if (args[0].equals("set")) {
+                if (args.length > 2) {
+                    if (!isRunning) {
+                        players.clear();
+                        int i;
+                        for (i = 1; i < args.length; i++) {
+
+                            players.add(Bukkit.getPlayerExact(args[i]));
+                            sender.sendMessage("Set player " + i + " to " + players.get(i - 1).getName());
+                            players.get(i - 1).sendMessage("You have been set to player " + i);
+                        }
+                        sender.sendMessage("players: " + players);
                     }
+                } else {
+                    sender.sendMessage("At least 2 players required!");
                 }
+
             }
-
-
 
 
             //############################# START ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("start")) {
-                if (player1 != null && player2 != null) {
-                    if (!isRunning) {
+                if (!isRunning) {
 
-                        isRunning = true;
-                        secondsRemaining = time*60;
-                        player1.getWorld().setTime(0);
-                        player1.setGameMode(GameMode.SURVIVAL);
-                        player2.setGameMode(GameMode.SURVIVAL);
-                        player1.setHealth(20);
-                        player2.setHealth(20);
-                        player1.setFoodLevel(20);
-                        player2.setFoodLevel(20);
-                        player1.getInventory().clear();
-                        player2.getInventory().clear();
+                    isRunning = true;
+                    secondsRemaining = time*60;
 
+                    World world = Bukkit.getServer().getWorld("world");
+                    assert world != null;
+                    world.setTime(0);
 
-                        World world = Bukkit.getServer().getWorld("world");
+                    //############################# Init Players ################################
+                    for (Player player : players) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                        player.getInventory().clear();
+                        player.setHealth(20);
+                        player.setFoodLevel(20);
 
-                        double player1X = Math.random() * ( 1000 - -1000 );
-                        double player1Y = Math.random() * ( 1000 - -1000 );
-                        double player2X = Math.random() * ( 1000 - -1000 );
-                        double player2Y = Math.random() * ( 1000 - -1000 );
+                        double playerX = Math.random() * ( 1000 - -1000 );
+                        double playerY = Math.random() * ( 1000 - -1000 );
+                        Location startCoord = new Location(world,playerX,200,playerY);
+                        player.teleport(startCoord);
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200));
+                    }
 
-                        Location startCoord1 = new Location(world,player1X,200,player1Y);
-                        Location startCoord2 = new Location(world,player2X,200,player2Y);
-                        player1.teleport(startCoord1);
-                        player2.teleport(startCoord2);
-                        player1.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200));
-                        player2.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200));
-                        //effect give Joshalot minecraft:resistance 10 200 true
-
-                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap Started"));
-                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$cSwap time minutes: " + time));
-                        BukkitScheduler scheduler = getServer().getScheduler();
-
-                        timer = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-                            @Override
-                            public void run() {
-                                Location player1pos = player1.getLocation();
-                                Location player2pos = player2.getLocation();
-                                player1.teleport(player2pos);
-                                player2.teleport(player1pos);
-                                secondsRemaining = time*60;
-                            }
-                        }, 20*60*time, 20*60*time);
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap Started"));
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$cSwap time minutes: " + time));
+                    BukkitScheduler scheduler = getServer().getScheduler();
 
 
-                        countDown = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-                            @Override
-                            public void run() {
-                                secondsRemaining-=1;
-                                //int[] nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-                                for (int i : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-                                    if (i == secondsRemaining) {
-                                        Bukkit.broadcastMessage(i+1 + " Seconds remaining!");
-                                    }
+
+                    //############################# Create ################################
+                    timer = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+                        @Override
+                        public void run() {
+
+                            Location player1pos = players.get(0).getLocation();
+                            int i;
+                            for (i = 0; i < players.size(); i++) {
+                                if (players.get(i) == players.get(players.size() - 1)) {
+                                    players.get(i).teleport(player1pos);
+                                } else {
+                                    players.get(i).teleport(players.get(i+1).getLocation());
                                 }
                             }
-                        }, 0, 20);
+                            secondsRemaining = time*60;
+                        }
+                    }, 20*60*time, 20*60*time);
 
 
 
-                    } else {
-                        sender.sendMessage("Game already in progress!");
-                    }
+                    countDown = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+                        @Override
+                        public void run() {
+                            secondsRemaining-=1;
+                            //int[] nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+                            for (int i : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
+                                if (i == secondsRemaining) {
+                                    Bukkit.broadcastMessage(i+1 + " Seconds remaining!");
+                                }
+                            }
+                        }
+                    }, 0, 20);
+
+
+
                 } else {
-                    sender.sendMessage("Please set 2 valid players.");
-                    sender.sendMessage("Usage: ds <player1> <player2>");
+                    sender.sendMessage("Game already in progress!");
                 }
             }
-
-
-
             return true;
         }
         return false;
     }
 }
+
+
+// ds lobby
+// ds join
+// ds leave
+// when starting, check for min 2 players
