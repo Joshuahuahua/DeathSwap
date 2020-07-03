@@ -103,12 +103,14 @@ public class Main extends JavaPlugin implements Listener {
 
             //################################# /ds help ################################
             if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
-                sender.sendMessage("Usage: /ds create");
-                sender.sendMessage("Usage: /ds timeset <minutes>");
-                sender.sendMessage("Usage: /ds join");
-                sender.sendMessage("Usage: /ds leave");
-                sender.sendMessage("Usage: /ds start");
-                sender.sendMessage("Usage: /ds stop");
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$e--------- $fHelp: Index (1/1) $e---------------------"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$6Aliases: $f/deathswap, /ds"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$6/ds create: $fCreates a new DeathSwap Lobby"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$6/ds timeset: $fSet swap time (minutes)"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$6/ds join: $fJoins available DeathSwap lobby"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$6/ds leave: $fLeaves current lobby"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$6/ds start: $fStarts DeathSwap match"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$6/ds stop: $fStops DeathSwap match"));
             }
 
 
@@ -118,28 +120,27 @@ public class Main extends JavaPlugin implements Listener {
                 if (sender.getName().equals(host.getName())) {
                     if (!isRunning) {
                         time = Integer.parseInt(args[1])*60;
-                        sender.sendMessage("Set time to " + time/60);
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"Set time to$e " + time/60));
                     } else {
-                        sender.sendMessage("You can not change the game mid-game!");
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$cYou can not change the game mid-game!"));
                     }
                 } else {
-                    sender.sendMessage("Only the host can do that!");
+                    sender.sendMessage("$4Only the host can do that!");
                 }
             }
 
 
             //############################## /ds create ################################
-            if (args.length == 1 && args[0].equalsIgnoreCase("create")) {
+            if (args.length == 1 && (args[0].equalsIgnoreCase("create")) || args[0].equalsIgnoreCase("host")) {
                 if (host == null) {
                     host = (Player) sender;
                     lobby.add(host);
-                    Bukkit.broadcastMessage(host.getName() + " is hosting DeathSwap!");
-                    Bukkit.broadcastMessage("Use /ds join to join!");
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$a$l" + host.getName() + " $r$fis hosting $cDeathSwap!"));
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$dUse /ds join to join!"));
                 } else {
-                    sender.sendMessage(host.getName() + " is already hosting DeathSwap!");
-                    sender.sendMessage("Use /ds join to join!");
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$c$l" + host.getName() + " $r$cis already hosting DeathSwap!"));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$dUse /ds join to join!"));
                 }
-                sender.sendMessage("players: " + lobby);
             }
 
 
@@ -149,19 +150,18 @@ public class Main extends JavaPlugin implements Listener {
                 if (host != null) {
                     if (!lobby.contains((Player) sender)) {
                         lobby.add((Player) sender);
-                        Bukkit.broadcastMessage(sender.getName() + " has joined the lobby!");
-                        sender.sendMessage("Current players in your lobby:");
+                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$6" + sender.getName() + " $ahas joined the lobby!"));
+                        sender.sendMessage("$lCurrent players in your lobby:");
                         for (Player player : lobby) {
-                            sender.sendMessage(player.getName());
+                            sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$6" + player.getName()));
                         }
                     } else {
-                        sender.sendMessage("You are already in a lobby!");
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$cYou are already in a lobby!"));
                     }
                 } else {
-                    sender.sendMessage("There are no available games to join!");
-                    sender.sendMessage("Use /ds create to create one!");
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$cThere are no available games to join!"));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$6Use /ds create to create one!"));
                 }
-                sender.sendMessage("players: " + lobby);
             }
 
 
@@ -170,20 +170,19 @@ public class Main extends JavaPlugin implements Listener {
             if (args.length == 1 && args[0].equalsIgnoreCase("leave")) {
                 if (lobby.contains((Player) sender)) {
                     lobby.remove((Player) sender);
-                    Bukkit.broadcastMessage(sender.getName() + " has left the lobby!");
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$6" + sender.getName() + " $chas left the lobby!"));
                 } else {
-                    sender.sendMessage("You are not in a lobby!");
-                    sender.sendMessage("Use /ds create to create one or /ds join to join an existing one!");
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"You are not in a lobby!"));
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$6Use /ds create to create one or /ds join to join an existing one!"));
                 }
                 if (sender.getName().equals(host.getName())) {
-                    Bukkit.broadcastMessage(host.getName() + " has closed the lobby!");
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$4" + host.getName() + " $chas closed the lobby!"));
                     for (Player player : lobby) {
-                        player.sendMessage("You have been removed from the lobby!");
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('$',"$cYou have been removed from the lobby!"));
                     }
                     host = null;
                     lobby.clear();
                 }
-                sender.sendMessage("players: " + lobby);
             }
 
 
@@ -198,10 +197,10 @@ public class Main extends JavaPlugin implements Listener {
                         Bukkit.getScheduler().cancelTask(countDown);
                         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$', "$c$lDeath Swap Stopped"));
                     } else {
-                        sender.sendMessage("No active Death Swap!");
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$cNo active Death Swap!"));
                     }
                 } else {
-                    sender.sendMessage("Only the host can do that!");
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$', "$cOnly the host can do that!"));
                 }
             }
 
@@ -234,7 +233,7 @@ public class Main extends JavaPlugin implements Listener {
                             }
 
                             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$c$lDeath Swap Started"));
-                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$cSwap time minutes: " + time));
+                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$',"$4Swap time minutes:$c$l " + time));
                             BukkitScheduler scheduler = getServer().getScheduler();
 
 
@@ -266,19 +265,19 @@ public class Main extends JavaPlugin implements Listener {
                                     //int[] nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
                                     for (int i : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
                                         if (i == secondsRemaining) {
-                                            Bukkit.broadcastMessage(i+1 + " Seconds remaining!");
+                                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('$', "$c$l" + i+1 + " $r$4Seconds remaining!"));
                                         }
                                     }
                                 }
                             }, 0, 20);
                         } else {
-                            sender.sendMessage("At least 2 players are required for DeathSwap!");
+                            sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$cAt least 2 players are required for DeathSwap!"));
                         }
                     } else {
-                        sender.sendMessage("Game already in progress!");
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$cGame already in progress!"));
                     }
                 } else {
-                    sender.sendMessage("Only the host can do that!");
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('$',"$cOnly the host can do that!"));
                 }
             }
             return true;
@@ -286,9 +285,3 @@ public class Main extends JavaPlugin implements Listener {
         return false;
     }
 }
-
-
-// ds lobby
-// ds join
-// ds leave
-// when starting, check for min 2 players
