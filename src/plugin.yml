@@ -7,3 +7,4 @@ description: Multiplayer DeathSwap Plugin
 commands:
   Deathswap:
     aliases: ds
+    description: Use /ds help for more information

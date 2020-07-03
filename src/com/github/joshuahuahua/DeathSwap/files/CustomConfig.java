@@ -7,13 +7,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
-public class Config {
+public class customConfig {
 
     private static File file;
     private static FileConfiguration configFile;
 
     public static void setup() {
-        file = new File(Bukkit.getServer().getPluginManager().getPlugin("DeathSwap").getDataFolder(), "config.yml");
+        file = new File(Bukkit.getServer().getPluginManager().getPlugin("DeathSwap").getDataFolder(), "customConfig.yml");
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -32,7 +32,11 @@ public class Config {
         try {
             configFile.save(file);
         } catch (IOException e) {
-            //
+            System.out.println("Couldn't save file");
         }
+    }
+
+    public static void reload() {
+        configFile = YamlConfiguration.loadConfiguration(file);
     }
 }
