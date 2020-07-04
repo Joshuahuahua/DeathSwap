@@ -13,7 +13,7 @@ public class customConfig {
     private static FileConfiguration configFile;
 
     public static void setup() {
-        file = new File(Bukkit.getServer().getPluginManager().getPlugin("DeathSwap").getDataFolder(), "customConfig.yml");
+        file = new File(Bukkit.getServer().getPluginManager().getPlugin("DeathSwap").getDataFolder(), "options.yml");
         if (!file.exists()) {
             try {
                 file.createNewFile();
