@@ -6,20 +6,29 @@ import com.github.joshuahuahua.DeathSwap.message;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class onJoin implements Listener {
 
-    public onJoin(Main plugin) {
+    private final Main plugin;
 
+    public onJoin(Main plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (customConfig.get().getBoolean("messageOnJoin")){
-            message.player(event.getPlayer(), "$c$lWelcome to DeathSwap");
-            message.player(event.getPlayer(), "$cBy Joshalot and Nel");
-            message.player(event.getPlayer(), "$aUse /ds help for available commands!");
-        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (customConfig.get().getBoolean("messageOnJoin")){
+                    message.player(event.getPlayer(), "$c$lWelcome to DeathSwap");
+                    message.player(event.getPlayer(), "$cBy Joshalot and Nel");
+                    message.player(event.getPlayer(), "$aUse /ds help for available commands!");
+                }
+            }
+        }.runTaskLater(plugin, 5);
+
     }
 
 }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Main extends JavaPlugin implements Listener {
+public class Main extends JavaPlugin {
 
 
     // VARS
@@ -34,6 +34,7 @@ public class Main extends JavaPlugin implements Listener {
     public static boolean isRunning;
     Player host = null;
     public static List<Player> lobby = new ArrayList<>();
+
 
 
     @Override
