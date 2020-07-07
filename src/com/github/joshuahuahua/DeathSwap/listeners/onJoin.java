@@ -21,7 +21,7 @@ public class onJoin implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (customConfig.get().getBoolean("messageOnJoin")){
+                if (customConfig.get().getBoolean("messageOnJoin")) {
                     message.player(event.getPlayer(), "$c$lWelcome to DeathSwap");
                     message.player(event.getPlayer(), "$cBy Joshalot and Nel");
                     message.player(event.getPlayer(), "$aUse /ds help for available commands!");
