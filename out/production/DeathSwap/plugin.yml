@@ -3,6 +3,7 @@ author: Joshalot
 main: com.github.joshuahuahua.DeathSwap.Main
 version: 1.5
 description: Multiplayer DeathSwap Plugin
+api-version: 1.13
 
 commands:
   Deathswap:
