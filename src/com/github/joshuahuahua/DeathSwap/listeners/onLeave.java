@@ -7,30 +7,26 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class onDeath implements Listener {
+public class onLeave implements Listener {
 
     private final Main plugin;
 
-    public onDeath(Main plugin) {
+    public onLeave(Main plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
+    public void onPlayerLeave(PlayerQuitEvent event) {
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (Main.isRunning) {
-                    int i;
-                    for (i = 0; i < Main.lobby.size(); i++) {
-                        if (Main.lobby.get(i).getName().equals(event.getEntity().getName())) {
-                            event.getEntity().setGameMode(GameMode.SPECTATOR);
-                            Main.lobby.remove(i);
-                        }
-                    }
+                    message.global("$6" + event.getPlayer().getName() + " $ahas left the DeathSwap!");
+                    Main.lobby.remove(event.getPlayer());
                     if (Main.lobby.size() == 1) {
                         Main.isRunning = false;
                         Main.stopSchedulers();
@@ -45,7 +41,6 @@ public class onDeath implements Listener {
                         Main.host = null;
                         Main.lobby.clear();
                     } else {
-                        message.global("$c$l" + event.getEntity().getName() + " has died!");
                         message.global("$c$l" + Main.lobby.size() + " players remaining.");
                     }
                 }
