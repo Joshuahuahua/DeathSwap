@@ -11,7 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
@@ -104,7 +103,7 @@ public class Main extends JavaPlugin {
 
             if (args.length == 1 && args[0].equalsIgnoreCase("test")) {
                 Inventory gamemodesInv = Bukkit.createInventory(null, 9, "Gamemodes");
-                gamemodesInv.setItem(0, createItem(Material.GRASS_BLOCK, "Default", "Default gamemode"));
+                gamemodesInv.setItem(0, createItem(Material.GRASS_BLOCK, ChatColor.RED + "Default", "Default gamemode"));
                 gamemodesInv.setItem(1, createItem(Material.SUGAR, "Speed", "Sets time to 60 seconds"));
                 Player player = (Player) sender;
                 player.openInventory(gamemodesInv);
