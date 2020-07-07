@@ -5,10 +5,7 @@ import com.github.joshuahuahua.DeathSwap.files.customConfig;
 import com.github.joshuahuahua.DeathSwap.listeners.onDeath;
 import com.github.joshuahuahua.DeathSwap.listeners.onJoin;
 import com.github.joshuahuahua.DeathSwap.listeners.onLeave;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -58,6 +55,7 @@ public class Main extends JavaPlugin {
         //saveDefaultConfig();
         customConfig.setup();
         customConfig.get().addDefault("messageOnJoin", true);
+        customConfig.get().addDefault("prefix", "$b$lDeathSwap$r$8> $7");
         customConfig.get().addDefault("time_seconds", 4);
         customConfig.get().addDefault("time_mins", 4);
         customConfig.get().addDefault("time_hours", 4);
@@ -94,14 +92,14 @@ public class Main extends JavaPlugin {
             //################################# /ds reload ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 customConfig.reload();
-                message.sender(sender, "$aDeathSwap reload complete");
+                message.sender(sender, "$aReload complete");
                 return true;
             }
 
 
             //################################# /ds help ################################
             if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
-                message.sender(sender,"$e--------- $fHelp: Index (1/1) $e---------------------");
+                message.sender(sender,"$e------------ $fHelp: Index (1/1) $e------------");
                 message.sender(sender,"$6Aliases: $f/deathswap, /ds");
                 message.sender(sender,"$6/ds create: $fCreates a new DeathSwap Lobby");
                 message.sender(sender,"$6/ds timeset: $fSet swap time (minutes)");
@@ -126,8 +124,8 @@ public class Main extends JavaPlugin {
                         sender.sendMessage("$cOnly the host can do that!");
                     }
                 } else {
-                    message.sender(sender,"$cThere is no one hosting DeathSwap!");
-                    message.sender(sender,"$dUse /ds create to host a lobby!");
+                    message.sender(sender,"$cThere are no available lobbies!");
+                    message.sender(sender,"Use /ds create to host a lobby!");
                 }
                 return true;
             }
@@ -138,11 +136,11 @@ public class Main extends JavaPlugin {
                 if (host == null) {
                     host = (Player) sender;
                     lobby.add(host);
-                    message.global("$a$l" + host.getName() + " $r$fis hosting $cDeathSwap!");
-                    message.global("$dUse /ds join to join!");
+                    message.global("$a$l" + host.getName() + " $r$7is has created a lobby!");
+                    message.global("Use /ds join to join!");
                 } else {
-                    message.sender(sender,"$c$l" + host.getName() + " $r$cis already hosting DeathSwap!");
-                    message.sender(sender,"$dUse /ds join to join!");
+                    message.sender(sender,"$a$l" + host.getName() + " $r$cis already hosting DeathSwap!");
+                    message.sender(sender,"Use /ds join to join!");
                 }
                 return true;
             }
@@ -153,44 +151,51 @@ public class Main extends JavaPlugin {
                 if (host != null) {
                     if (!lobby.contains((Player) sender)) {
                         lobby.add((Player) sender);
-                        message.global("$6" + sender.getName() + " $ahas joined the lobby!");
-                        message.sender(sender,"$lCurrent players in your lobby:");
-                        for (Player player : lobby) {
-                            message.sender(sender,"$6" + player.getName());
-                        }
+                        message.global("$a$l" + sender.getName() + " $r$7has joined the lobby!");
                     } else {
                         message.sender(sender,"$cYou are already in a lobby!");
                     }
                 } else {
-                    message.sender(sender,"$cThere are no available games to join!");
-                    message.sender(sender,"$dUse /ds create to host a lobby!");
+                    message.sender(sender,"$cThere are no available lobbies!");
+                    message.sender(sender,"Use /ds create to host a lobby!");
                 }
                 return true;
             }
 
-
+            //############################## /ds list ################################
+            if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
+                if (lobby.contains((Player) sender)) {
+                    message.sender(sender,"$lCurrent players in your lobby:");
+                    for (Player player : lobby) {
+                        message.sender(sender, player.getName());
+                    }
+                } else {
+                    message.sender(sender,"$cYou are not in a lobby!");
+                    message.sender(sender,"Use /ds create to create one or /ds join to join an existing one!");
+                }
+            }
 
             //############################## /ds leave ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("leave")) {
                 if (host != null) {
-                    if (lobby.contains((Player) sender)) {
-                        lobby.remove((Player) sender);
-                        message.global("$6" + sender.getName() + " $chas left the lobby!");
-                    } else {
-                        message.sender(sender,"You are not in a lobby!");
-                        message.sender(sender,"$6Use /ds create to create one or /ds join to join an existing one!");
-                    }
                     if (sender.getName().equals(host.getName())) {
-                        message.global("$4" + host.getName() + " $chas closed the lobby!");
+                        message.global("$a$l" + host.getName() + " $r$7has closed the lobby!");
                         for (Player player : lobby) {
                             message.player(player,"$cYou have been removed from the lobby!");
                         }
                         host = null;
                         lobby.clear();
                     }
+                    if (lobby.contains((Player) sender)) {
+                        lobby.remove((Player) sender);
+                        message.global("$a$l" + sender.getName() + " $r$7has left the lobby!");
+                    } else {
+                        message.sender(sender,"$cYou are not in a lobby!");
+                        message.sender(sender,"Use /ds create to create one or /ds join to join an existing one!");
+                    }
                 } else {
-                    message.sender(sender,"$cThere is no one hosting DeathSwap!");
-                    message.sender(sender,"$dUse /ds create to host a lobby!");
+                    message.sender(sender,"$cThere are no available lobbies!");
+                    message.sender(sender,"Use /ds create to host a lobby!");
                 }
                 return true;
             }
@@ -244,9 +249,11 @@ public class Main extends JavaPlugin {
                                     player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200));
                                 }
 
-                                message.global("$c$lDeath Swap Started");
                                 int divTime = time/60;
-                                message.global("$4Swap time minutes:$c$l " + divTime);
+                                message.global("$a$lDeathSwap Started");
+                                for (Player player : lobby) {
+                                    player.sendTitle(ChatColor.translateAlternateColorCodes('$', "$a$lDeathSwap Started"), ChatColor.translateAlternateColorCodes('$',"$aSwap time minutes:$c$l " + divTime), 10,40,10);
+                                }
                                 BukkitScheduler scheduler = getServer().getScheduler();
 
 
@@ -255,7 +262,9 @@ public class Main extends JavaPlugin {
                                 timer = scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
                                     @Override
                                     public void run() {
-
+                                        for (Player player : lobby) {
+                                            player.sendTitle(ChatColor.translateAlternateColorCodes('$', "$b$lSwap!"), "", 5,10,5);
+                                        }
                                         Location player1pos = lobby.get(0).getLocation();
                                         int i;
                                         for (i = 0; i < lobby.size(); i++) {
@@ -278,7 +287,7 @@ public class Main extends JavaPlugin {
                                         for (int i : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
                                             if (i == secondsRemaining) {
                                                 int addedSeconds = i+1;
-                                                message.global("$c$l" + addedSeconds + " $r$4Seconds remaining!");
+                                                message.global("$a$l" + addedSeconds + " $r$7seconds remaining!");
                                             }
                                         }
                                     }
@@ -294,15 +303,14 @@ public class Main extends JavaPlugin {
                     }
                 } else {
                     message.sender(sender,"$cThere is no one hosting DeathSwap!");
-                    message.sender(sender,"$dUse /ds create to host a lobby!");
+                    message.sender(sender,"Use /ds create to host a lobby!");
                 }
                 return true;
             }
             message.sender(sender,"$cInvalid command!");
-            message.sender(sender,"$cUse /ds help for a list of available commands.");
+            message.sender(sender,"Use /ds help for a list of available commands.");
             return true;
         } else {
-            message.global("return false");
             return false;
         }
     }

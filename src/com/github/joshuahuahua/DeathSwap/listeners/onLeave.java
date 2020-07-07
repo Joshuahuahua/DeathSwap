@@ -31,10 +31,8 @@ public class onLeave implements Listener {
                         Main.isRunning = false;
                         Main.stopSchedulers();
                         message.global("$c$lDeath Swap has ended");
-                        message.global("$a" + Main.lobby.get(0).getName() + " $fis the winner!");
+                        message.global("$a$l" + Main.lobby.get(0).getName() + " $r$7is the winner!");
 
-                        message.player(Main.lobby.get(0),"$d$lYou are the winner!");
-                        message.player(Main.lobby.get(0),"$dHave some cake :)");
                         Main.lobby.get(0).getInventory().clear();
                         Main.lobby.get(0).getInventory().addItem(new ItemStack(Material.CAKE, 1));
 
