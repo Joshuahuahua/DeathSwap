@@ -5,10 +5,15 @@ import com.github.joshuahuahua.DeathSwap.files.customConfig;
 import com.github.joshuahuahua.DeathSwap.listeners.onDeath;
 import com.github.joshuahuahua.DeathSwap.listeners.onJoin;
 import com.github.joshuahuahua.DeathSwap.listeners.onLeave;
+import com.github.joshuahuahua.DeathSwap.listeners.playerClickInventory;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -32,6 +37,9 @@ public class Main extends JavaPlugin {
     public static Player host = null;
     public static List<Player> lobby = new ArrayList<>();
 
+    // Game Rules
+    public static boolean autoSmelt = false;
+
 
 
     @Override
@@ -42,9 +50,8 @@ public class Main extends JavaPlugin {
         pluginManager.registerEvents(new onJoin(this), this);
         pluginManager.registerEvents(new onDeath(this), this);
         pluginManager.registerEvents(new onLeave(this), this);
+        pluginManager.registerEvents(new playerClickInventory(), this);
 
-
-        getLogger().info("DeathSwap Enabled");
 
 
         // Config File (Please neaten this up)
@@ -56,15 +63,12 @@ public class Main extends JavaPlugin {
         customConfig.setup();
         customConfig.get().addDefault("messageOnJoin", true);
         customConfig.get().addDefault("prefix", "$b$lDeathSwap$r$8> $7");
-        customConfig.get().addDefault("time_seconds", 4);
-        customConfig.get().addDefault("time_mins", 4);
-        customConfig.get().addDefault("time_hours", 4);
+        customConfig.get().addDefault("time", "1:00");
 
         //time input should be as follows;
         // 10 == 10 seconds
         // 1:10 == 1min 10 seconds
-        // 1:10:10 == 1hour 1min 10 seconds
-        // 1:10:10:10 == INVALID
+        // 1:10:10 == INVALID
         customConfig.get().options().copyDefaults(true);
         customConfig.save();
 
@@ -72,6 +76,7 @@ public class Main extends JavaPlugin {
         //int time = Integer.parseInt(Objects.requireNonNull(customConfig.get().getString("time_seconds")));
 
 
+        getLogger().info("DeathSwap Enabled");
     }
 
     @Override
@@ -93,6 +98,24 @@ public class Main extends JavaPlugin {
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 customConfig.reload();
                 message.sender(sender, "$aReload complete");
+                return true;
+            }
+
+
+            if (args.length == 1 && args[0].equalsIgnoreCase("test")) {
+                Inventory gamemodesInv = Bukkit.createInventory(null, 9, "Gamemodes");
+                gamemodesInv.setItem(0, createItem(Material.GRASS_BLOCK, "Default", "Default gamemode"));
+                gamemodesInv.setItem(1, createItem(Material.SUGAR, "Speed", "Sets time to 60 seconds"));
+                Player player = (Player) sender;
+                player.openInventory(gamemodesInv);
+                return true;
+            }
+            if (args.length == 1 && args[0].equalsIgnoreCase("test2")) {
+                Inventory testInv = Bukkit.createInventory(null, 9, "Test");
+                testInv.setItem(0, createItem(Material.GRASS_BLOCK, "Test1", "Default gamemode"));
+                testInv.setItem(1, createItem(Material.SUGAR, "Test2", "Sets time to 60 seconds"));
+                Player player = (Player) sender;
+                player.openInventory(testInv);
                 return true;
             }
 
@@ -319,5 +342,17 @@ public class Main extends JavaPlugin {
     public static void stopSchedulers() {
         Bukkit.getScheduler().cancelTask(timer);
         Bukkit.getScheduler().cancelTask(countDown);
+    }
+
+    public ItemStack createItem(Material material, String name, String lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        ArrayList<String> itemLore = new ArrayList<String>();
+        itemLore.add(lore);
+        meta.setLore(itemLore);
+        meta.setDisplayName(name);
+        item.setItemMeta(meta);
+        return item;
+
     }
 }
