@@ -19,8 +19,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class Main extends JavaPlugin {
@@ -36,10 +35,7 @@ public class Main extends JavaPlugin {
     public static Player host = null;
     public static List<Player> lobby = new ArrayList<>();
 
-    // Game Rules
     public static boolean autoSmelt = false;
-
-
 
     @Override
     public void onEnable() {
@@ -53,28 +49,19 @@ public class Main extends JavaPlugin {
 
 
 
-        // Config File (Please neaten this up)
+        //time input should be as follows;
+        // 10 == 10 seconds
+        // 1:10 == 1min 10 seconds
+        // 1:10:10 == INVALID
 
         //Setup config
-
-        //getConfig().options().copyDefaults();
-        //saveDefaultConfig();
         customConfig.setup();
         customConfig.get().addDefault("messageOnJoin", true);
         customConfig.get().addDefault("prefix", "$b$lDeathSwap$r$8> $7");
         customConfig.get().addDefault("time", "1:00");
 
-        //time input should be as follows;
-        // 10 == 10 seconds
-        // 1:10 == 1min 10 seconds
-        // 1:10:10 == INVALID
         customConfig.get().options().copyDefaults(true);
         customConfig.save();
-
-        // assign var from config
-        //int time = Integer.parseInt(Objects.requireNonNull(customConfig.get().getString("time_seconds")));
-
-
         getLogger().info("DeathSwap Enabled");
     }
 
@@ -100,24 +87,15 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
-
-            if (args.length == 1 && args[0].equalsIgnoreCase("test")) {
-                Inventory gamemodesInv = Bukkit.createInventory(null, 9, "Gamemodes");
-                gamemodesInv.setItem(0, createItem(Material.GRASS_BLOCK, ChatColor.RED + "Default", "Default gamemode"));
-                gamemodesInv.setItem(1, createItem(Material.SUGAR, "Speed", "Sets time to 60 seconds"));
-                Player player = (Player) sender;
-                player.openInventory(gamemodesInv);
+            //################################# /ds gamemode/gamerule ################################
+            if (args.length == 1 && (args[0].equalsIgnoreCase("gamemode") || args[0].equalsIgnoreCase("gm"))) {
+                selectInv((Player) sender, "gamemodeInv");
                 return true;
             }
-            if (args.length == 1 && args[0].equalsIgnoreCase("test2")) {
-                Inventory testInv = Bukkit.createInventory(null, 9, "Test");
-                testInv.setItem(0, createItem(Material.GRASS_BLOCK, "Test1", "Default gamemode"));
-                testInv.setItem(1, createItem(Material.SUGAR, "Test2", "Sets time to 60 seconds"));
-                Player player = (Player) sender;
-                player.openInventory(testInv);
+            if (args.length == 1 && (args[0].equalsIgnoreCase("gamerule") || args[0].equalsIgnoreCase("gr"))) {
+                selectInv((Player) sender, "gameruleInv");
                 return true;
             }
-
 
             //################################# /ds help ################################
             if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
@@ -152,7 +130,6 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
-
             //############################## /ds create ################################
             if (args.length == 1 && (args[0].equalsIgnoreCase("create") || args[0].equalsIgnoreCase("host"))) {
                 if (host == null) {
@@ -166,7 +143,6 @@ public class Main extends JavaPlugin {
                 }
                 return true;
             }
-
 
             //############################## /ds join ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("join")) {
@@ -207,6 +183,7 @@ public class Main extends JavaPlugin {
                         }
                         host = null;
                         lobby.clear();
+                        return true;
                     }
                     if (lobby.contains((Player) sender)) {
                         lobby.remove((Player) sender);
@@ -222,10 +199,7 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
-
-
             //############################## /ds stop ################################
-
             if (args.length == 1 && args[0].equalsIgnoreCase("stop")) {
                 if (host != null) {
                     if (sender.getName().equals(host.getName())) {
@@ -242,7 +216,6 @@ public class Main extends JavaPlugin {
                 }
                 return true;
             }
-
 
             //############################# START ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("start")) {
@@ -329,6 +302,9 @@ public class Main extends JavaPlugin {
                 }
                 return true;
             }
+
+
+
             message.sender(sender,"$cInvalid command!");
             message.sender(sender,"Use /ds help for a list of available commands.");
             return true;
@@ -353,5 +329,46 @@ public class Main extends JavaPlugin {
         item.setItemMeta(meta);
         return item;
 
+    }
+
+    public static ItemStack gameruleItem(Boolean gamerule, String gameruleName) {
+        ItemStack item = new ItemStack(Material.REDSTONE_BLOCK);
+        ArrayList<String> itemLore = new ArrayList<String>();
+
+        if (gamerule) {
+            item = new ItemStack(Material.EMERALD_BLOCK);
+            itemLore.add("Enabled");
+        } else {
+            itemLore.add("Disabled");
+        }
+        ItemMeta meta = item.getItemMeta();
+        meta.setLore(itemLore);
+        meta.setDisplayName(gameruleName);
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public void selectInv(Player player, String inventory) {
+
+        if (inventory.equalsIgnoreCase("gamemodeInv")) {
+            Inventory gamemodeInv = Bukkit.createInventory(null, 9, "Gamemodes");
+
+            gamemodeInv.addItem(createItem(Material.GRASS_BLOCK, "Default", "Default gamemode"));
+            gamemodeInv.addItem(createItem(Material.SUGAR, "Speed", "Sets time to 60 seconds"));
+            gamemodeInv.addItem(createItem(Material.ENDER_EYE, "Blind", "Removes the countdown"));
+
+            player.openInventory(gamemodeInv);
+
+
+        }
+
+        if (inventory.equalsIgnoreCase("gameruleInv")) {
+            Inventory gameruleInv = Bukkit.createInventory(null, 45, "Gamerules");
+
+            gameruleInv.setItem(0, gameruleItem(autoSmelt, "autoSmelt"));
+
+            player.openInventory(gameruleInv);
+        }
     }
 }

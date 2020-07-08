@@ -1,11 +1,13 @@
 package com.github.joshuahuahua.DeathSwap.listeners;
 
+import com.github.joshuahuahua.DeathSwap.Main;
 import com.github.joshuahuahua.DeathSwap.message;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+
+import java.util.Objects;
 
 public class playerClickInventory implements Listener {
 
@@ -13,26 +15,37 @@ public class playerClickInventory implements Listener {
     public void onPlayerClickInventory(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
-        message.global(event.getView().getTitle());
         if (event.getView().getTitle().equals("Gamemodes")) {
-            if (event.getCurrentItem().getItemMeta() != null) {
-                event.getCurrentItem().getItemMeta().getDisplayName();
-                if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Default")) {
-                    player.sendMessage("You clicked Default!!!");
-                    event.setCancelled(true);
-                } else if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Speed")) {
-                    player.sendMessage("You clicked Speed!!!");
-                }
+
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Default")) {
+                changeGamemode(player,"Default");
             }
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Speed")) {
+                changeGamemode(player,"Speed");
+            }
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Blind")) {
+                changeGamemode(player,"Blind");
+            }
+            event.setCancelled(true);
 
 
 
+        } else if (event.getView().getTitle().equals("Gamerules")) {
 
-
-        } else if (event.getView().getTitle().equals("Test")) {
-            player.sendMessage("You clicked on the second gui!!!");
+            if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Enabled")) {
+                player.closeInventory();
+            } else {
+                return;
+            }
+            event.setCancelled(true);
         }
-        event.setCancelled(true);
+    }
+    public static void changeGamemode(Player player, String gamemode) {
+        player.closeInventory();
+        message.global("Gamemode set to $l" + gamemode);
+        //Main.gamemode = gamemode
+        // or something to that effect
     }
 }
+
 
