@@ -33,7 +33,7 @@ public class AutoSmelt implements Listener {
         Block block = event.getBlock();
         Material drop;
 
-        if (Main.autoSmelt) {
+        if (Main.gameRules.get("autoSmelt")) {
             if (event.getBlock().getType() == Material.GOLD_ORE) {
                 drop = Material.GOLD_INGOT;
             } else if (event.getBlock().getType() == Material.IRON_ORE) {

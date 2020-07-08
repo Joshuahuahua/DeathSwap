@@ -28,7 +28,7 @@ public class Main extends JavaPlugin {
 
     // VARS
     // Time should be seconds + minutes + hours
-    int time = 5*60;
+    public static int time = 5*60;
     static int timer;
     static int countDown;
     int secondsRemaining;
@@ -37,7 +37,28 @@ public class Main extends JavaPlugin {
     public static List<Player> lobby = new ArrayList<>();
     public static String gamemode = "Default";
 
-    public static boolean autoSmelt = false;
+    // Game Rules
+    //public static boolean autoSmelt = false;
+
+
+
+    public static HashMap<String, Boolean> getGameRules() {
+        HashMap<String, Boolean> gameRules = new HashMap<String, Boolean>();
+
+        gameRules.put("autoSmelt", false);
+        gameRules.put("speed", false);
+        gameRules.put("countDown", true);
+
+        return gameRules;
+    }
+    public static HashMap<String, Boolean> gameRules = Main.getGameRules();
+
+
+
+
+
+
+
 
     @Override
     public void onEnable() {
@@ -65,6 +86,11 @@ public class Main extends JavaPlugin {
 
         customConfig.get().options().copyDefaults(true);
         customConfig.save();
+
+
+
+
+
         getLogger().info("DeathSwap Enabled");
     }
 
@@ -83,12 +109,23 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
+
+            //################################# /ds reload ################################
+            if (args.length == 1 && args[0].equalsIgnoreCase("test")) {
+                for (Map.Entry<String, Boolean> gameRule : gameRules.entrySet()) {
+                    message.global(gameRule.getKey() + " / " + gameRule.getValue());
+                }
+                return true;
+            }
+
+
             //################################# /ds reload ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 customConfig.reload();
                 message.sender(sender, "$aReload complete");
                 return true;
             }
+
 
             //################################# /ds gamemode/gamerule ################################
             if (args.length == 1 && (args[0].equalsIgnoreCase("gamemode") || args[0].equalsIgnoreCase("gm"))) {
@@ -99,6 +136,7 @@ public class Main extends JavaPlugin {
                 selectInv((Player) sender, "gameruleInv");
                 return true;
             }
+
 
             //################################# /ds help ################################
             if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
@@ -113,6 +151,7 @@ public class Main extends JavaPlugin {
                 message.sender(sender,"$6/ds query: $fReturns swap time remaining");
                 return true;
             }
+
 
             //############################## /ds timeset <num> ################################
             if (args.length == 2 && args[0].equalsIgnoreCase("timeset")) {
@@ -134,6 +173,7 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
+
             //############################## /ds create ################################
             if (args.length == 1 && (args[0].equalsIgnoreCase("create") || args[0].equalsIgnoreCase("host"))) {
                 if (host == null) {
@@ -147,6 +187,7 @@ public class Main extends JavaPlugin {
                 }
                 return true;
             }
+
 
             //############################## /ds join ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("join")) {
@@ -168,6 +209,7 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
+
             //############################## /ds list ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
                 if (lobby.contains((Player) sender)) {
@@ -181,6 +223,7 @@ public class Main extends JavaPlugin {
                 }
                 return true;
             }
+
 
             //############################## /ds leave ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("leave")) {
@@ -208,6 +251,7 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
+
             //############################## /ds stop ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("stop")) {
                 if (host != null) {
@@ -225,6 +269,7 @@ public class Main extends JavaPlugin {
                 }
                 return true;
             }
+
 
             //############################# START ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("start")) {
@@ -288,10 +333,12 @@ public class Main extends JavaPlugin {
                                     @Override
                                     public void run() {
                                         secondsRemaining-=1;
-                                        for (int i : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-                                            if (i == secondsRemaining) {
-                                                int addedSeconds = i+1;
-                                                message.global("$a$l" + addedSeconds + " $r$7seconds remaining!");
+                                        if (gameRules.get("countDown")) {
+                                            for (int i : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
+                                                if (i == secondsRemaining) {
+                                                    int addedSeconds = i+1;
+                                                    message.global("$a$l" + addedSeconds + " $r$7seconds remaining!");
+                                                }
                                             }
                                         }
                                     }
@@ -311,6 +358,7 @@ public class Main extends JavaPlugin {
                 }
                 return true;
             }
+
 
             //############################## /ds query ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("query")) {
@@ -391,9 +439,14 @@ public class Main extends JavaPlugin {
         }
 
         if (inventory.equalsIgnoreCase("gameruleInv")) {
-            Inventory gameruleInv = Bukkit.createInventory(null, 45, "Gamerules");
 
-            gameruleInv.setItem(0, gameruleItem(autoSmelt, "autoSmelt"));
+
+            Inventory gameruleInv = Bukkit.createInventory(null, (int) Math.ceil(gameRules.size()/9.0)*9, "Gamerules");
+
+
+            for (Map.Entry<String, Boolean> gameRule : gameRules.entrySet()) {
+                gameruleInv.addItem(gameruleItem(gameRule.getValue(), gameRule.getKey()));
+            }
 
             player.openInventory(gameruleInv);
         }

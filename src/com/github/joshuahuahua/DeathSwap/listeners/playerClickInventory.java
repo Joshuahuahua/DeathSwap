@@ -18,12 +18,19 @@ public class playerClickInventory implements Listener {
         if (event.getView().getTitle().equals("Gamemodes")) {
 
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Default")) {
+                Main.gameRules.put("autoSmelt", false);
+                Main.gameRules.put("speed", false);
+                Main.gameRules.put("countDown", true);
                 changeGamemode(player,"Default");
             }
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Speed")) {
+                Main.gameRules.put("autoSmelt", true);
+                Main.gameRules.put("speed", true);
+                Main.time = 60;
                 changeGamemode(player,"Speed");
             }
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Blind")) {
+                Main.gameRules.put("countDown", false);
                 changeGamemode(player,"Blind");
             }
             event.setCancelled(true);
@@ -33,10 +40,7 @@ public class playerClickInventory implements Listener {
         }
 
         if (event.getView().getTitle().equals("Gamerules")) {
-
-            //if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Speed")) {}
-            if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Enabled")) { Main.autoSmelt = false;
-            } else { Main.autoSmelt = true; }
+            Main.gameRules.put(event.getCurrentItem().getItemMeta().getDisplayName(), !Main.gameRules.get(event.getCurrentItem().getItemMeta().getDisplayName()));
             event.setCancelled(true);
             Main.selectInv(player, "gameruleInv");
         }
@@ -47,5 +51,4 @@ public class playerClickInventory implements Listener {
         Main.gamemode = gamemode;
     }
 }
-
 
