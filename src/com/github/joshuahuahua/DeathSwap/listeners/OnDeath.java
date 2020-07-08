@@ -2,19 +2,21 @@ package com.github.joshuahuahua.DeathSwap.listeners;
 
 import com.github.joshuahuahua.DeathSwap.Main;
 import com.github.joshuahuahua.DeathSwap.message;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class onDeath implements Listener {
+public class OnDeath implements Listener {
 
     private final Main plugin;
 
-    public onDeath(Main plugin) {
+    public OnDeath(Main plugin) {
         this.plugin = plugin;
     }
 
@@ -32,16 +34,7 @@ public class onDeath implements Listener {
                         }
                     }
                     if (Main.lobby.size() == 1) {
-                        Main.isRunning = false;
-                        Main.stopSchedulers();
-                        message.global("$c$lDeath Swap has ended");
-                        message.global("$a$l" + Main.lobby.get(0).getName() + " $r$7is the winner!");
-
-                        Main.lobby.get(0).getInventory().clear();
-                        Main.lobby.get(0).getInventory().addItem(new ItemStack(Material.CAKE, 1));
-
-                        Main.host = null;
-                        Main.lobby.clear();
+                        endGame();
                     } else {
                         message.global("$a$l" + event.getEntity().getName() + " has died!");
                         message.global("$c$l" + Main.lobby.size() + " players remaining.");
@@ -51,6 +44,24 @@ public class onDeath implements Listener {
         }.runTaskLater(plugin, 5);
 
 
+    }
+
+    public static void endGame() {
+        Main.isRunning = false;
+        Main.stopSchedulers();
+        PlayerClickInventory.defaultGamemode();
+        for(Player player: Bukkit.getOnlinePlayers()) {
+            Main.gameRuleInit(player);
+        }
+
+        message.global("$c$lDeath Swap has ended");
+        message.global("$a$l" + Main.lobby.get(0).getName() + " $r$7is the winner!");
+
+        Main.lobby.get(0).getInventory().clear();
+        Main.lobby.get(0).getInventory().addItem(new ItemStack(Material.CAKE, 1));
+
+        Main.host = null;
+        Main.lobby.clear();
     }
 
 }

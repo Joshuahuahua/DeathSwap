@@ -7,9 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.Objects;
-
-public class playerClickInventory implements Listener {
+public class PlayerClickInventory implements Listener {
 
     @EventHandler
     public void onPlayerClickInventory(InventoryClickEvent event) {
@@ -18,18 +16,18 @@ public class playerClickInventory implements Listener {
         if (event.getView().getTitle().equals("Gamemodes")) {
 
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Default")) {
-                Main.gameRules.put("autoSmelt", false);
-                Main.gameRules.put("speed", false);
-                Main.gameRules.put("countDown", true);
+                defaultGamemode();
                 changeGamemode(player,"Default");
             }
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Speed")) {
+                defaultGamemode();
                 Main.gameRules.put("autoSmelt", true);
                 Main.gameRules.put("speed", true);
                 Main.time = 60;
                 changeGamemode(player,"Speed");
             }
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Blind")) {
+                defaultGamemode();
                 Main.gameRules.put("countDown", false);
                 changeGamemode(player,"Blind");
             }
@@ -49,6 +47,13 @@ public class playerClickInventory implements Listener {
         player.closeInventory();
         message.global("Gamemode set to $l" + gamemode);
         Main.gamemode = gamemode;
+    }
+
+    public static void defaultGamemode() {
+        Main.gameRules.put("autoSmelt", false);
+        Main.gameRules.put("speed", false);
+        Main.gameRules.put("countDown", true);
+        Main.time = 60*5;
     }
 }
 

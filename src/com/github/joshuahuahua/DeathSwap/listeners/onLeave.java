@@ -11,11 +11,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class onLeave implements Listener {
+public class OnLeave implements Listener {
 
     private final Main plugin;
 
-    public onLeave(Main plugin) {
+    public OnLeave(Main plugin) {
         this.plugin = plugin;
     }
 
@@ -28,16 +28,7 @@ public class onLeave implements Listener {
                     message.global("$6" + event.getPlayer().getName() + " $ahas left the DeathSwap!");
                     Main.lobby.remove(event.getPlayer());
                     if (Main.lobby.size() == 1) {
-                        Main.isRunning = false;
-                        Main.stopSchedulers();
-                        message.global("$c$lDeath Swap has ended");
-                        message.global("$a$l" + Main.lobby.get(0).getName() + " $r$7is the winner!");
-
-                        Main.lobby.get(0).getInventory().clear();
-                        Main.lobby.get(0).getInventory().addItem(new ItemStack(Material.CAKE, 1));
-
-                        Main.host = null;
-                        Main.lobby.clear();
+                        OnDeath.endGame();
                     } else {
                         message.global("$c$l" + Main.lobby.size() + " players remaining.");
                     }

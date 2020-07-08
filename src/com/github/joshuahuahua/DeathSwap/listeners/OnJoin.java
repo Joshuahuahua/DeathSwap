@@ -6,13 +6,14 @@ import com.github.joshuahuahua.DeathSwap.message;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class onJoin implements Listener {
+public class OnJoin implements Listener {
 
     private final Main plugin;
 
-    public onJoin(Main plugin) {
+    public OnJoin(Main plugin) {
         this.plugin = plugin;
     }
 
@@ -26,6 +27,8 @@ public class onJoin implements Listener {
                     message.player(event.getPlayer(), "$cBy Joshalot and Nel");
                     message.player(event.getPlayer(), "$aUse /ds help for available commands!");
                 }
+                event.getPlayer().setWalkSpeed(0.2f);
+                event.getPlayer().removePotionEffect(PotionEffectType.FAST_DIGGING);
             }
         }.runTaskLater(plugin, 5);
 

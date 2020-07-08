@@ -2,10 +2,10 @@ package com.github.joshuahuahua.DeathSwap;
 
 // IMPORTS
 import com.github.joshuahuahua.DeathSwap.files.customConfig;
-import com.github.joshuahuahua.DeathSwap.listeners.onDeath;
-import com.github.joshuahuahua.DeathSwap.listeners.onJoin;
-import com.github.joshuahuahua.DeathSwap.listeners.onLeave;
-import com.github.joshuahuahua.DeathSwap.listeners.playerClickInventory;
+import com.github.joshuahuahua.DeathSwap.listeners.OnDeath;
+import com.github.joshuahuahua.DeathSwap.listeners.OnJoin;
+import com.github.joshuahuahua.DeathSwap.listeners.OnLeave;
+import com.github.joshuahuahua.DeathSwap.listeners.PlayerClickInventory;
 import com.github.joshuahuahua.DeathSwap.listeners.AutoSmelt;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -65,10 +65,10 @@ public class Main extends JavaPlugin {
 
 
         PluginManager pluginManager  = getServer().getPluginManager();
-        pluginManager.registerEvents(new onJoin(this), this);
-        pluginManager.registerEvents(new onDeath(this), this);
-        pluginManager.registerEvents(new onLeave(this), this);
-        pluginManager.registerEvents(new playerClickInventory(), this);
+        pluginManager.registerEvents(new OnJoin(this), this);
+        pluginManager.registerEvents(new OnDeath(this), this);
+        pluginManager.registerEvents(new OnLeave(this), this);
+        pluginManager.registerEvents(new PlayerClickInventory(), this);
         pluginManager.registerEvents(new AutoSmelt(this), this);
 
 
@@ -129,11 +129,35 @@ public class Main extends JavaPlugin {
 
             //################################# /ds gamemode/gamerule ################################
             if (args.length == 1 && (args[0].equalsIgnoreCase("gamemode") || args[0].equalsIgnoreCase("gm"))) {
-                selectInv((Player) sender, "gamemodeInv");
+                if (host != null) {
+                    if (sender.getName().equals(host.getName())) {
+                        if (!isRunning) {
+                            selectInv((Player) sender, "gamemodeInv");
+                        } else {
+                            message.sender(sender,"$cYou can not change this mid-game!");
+                        }
+                    } else {
+                        message.sender(sender,"$cOnly the host can do that!");
+                    }
+                } else {
+                    message.sender(sender,"$cOnly a host can do that!");
+                }
                 return true;
             }
             if (args.length == 1 && (args[0].equalsIgnoreCase("gamerule") || args[0].equalsIgnoreCase("gr"))) {
-                selectInv((Player) sender, "gameruleInv");
+                if (host != null) {
+                    if (sender.getName().equals(host.getName())) {
+                        if (!isRunning) {
+                            selectInv((Player) sender, "gameruleInv");
+                        } else {
+                            message.sender(sender,"$cYou can not change this mid-game!");
+                        }
+                    } else {
+                        message.sender(sender,"$cOnly the host can do that!");
+                    }
+                } else {
+                    message.sender(sender,"$cOnly a host can do that!");
+                }
                 return true;
             }
 
@@ -161,7 +185,7 @@ public class Main extends JavaPlugin {
                             time = Integer.parseInt(args[1])*60;
                             message.sender(sender,"Set time to$e " + time/60);
                         } else {
-                            message.sender(sender,"$cYou can not change the game mid-game!");
+                            message.sender(sender,"$cYou can not change this mid-game!");
                         }
                     } else {
                         sender.sendMessage("$cOnly the host can do that!");
@@ -259,6 +283,10 @@ public class Main extends JavaPlugin {
                         if (isRunning) {
                             isRunning = false;
                             stopSchedulers();
+                            PlayerClickInventory.defaultGamemode();
+                            for(Player player: Bukkit.getOnlinePlayers()) {
+                                Main.gameRuleInit(player);
+                            }
                             message.global("$c$lDeath Swap Stopped");
                         } else {
                             message.sender(sender,"$cNo active Death Swap!");
@@ -290,12 +318,14 @@ public class Main extends JavaPlugin {
                                     player.getInventory().clear();
                                     player.setHealth(20);
                                     player.setFoodLevel(20);
+                                    gameRuleInit(player);
+
 
                                     double playerX = Math.random() * ( 10000 - -10000 );
                                     double playerY = Math.random() * ( 10000 - -10000 );
                                     Location startCoord = new Location(world,playerX,200,playerY);
                                     player.teleport(startCoord);
-                                    player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200));
+                                    player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200, false,false,false));
                                 }
 
                                 int divTime = time/60;
@@ -449,6 +479,17 @@ public class Main extends JavaPlugin {
             }
 
             player.openInventory(gameruleInv);
+        }
+    }
+
+    public static void gameRuleInit(Player player) {
+
+        if (gameRules.get("speed")) {
+            player.setWalkSpeed(0.3f);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,999,2,false,false,false));
+        } else {
+            player.setWalkSpeed(0.2f);
+            player.removePotionEffect(PotionEffectType.FAST_DIGGING);
         }
     }
 }
