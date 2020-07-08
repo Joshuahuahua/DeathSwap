@@ -30,21 +30,21 @@ public class playerClickInventory implements Listener {
 
 
 
-        } else if (event.getView().getTitle().equals("Gamerules")) {
+        }
 
-            if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Enabled")) {
-                player.closeInventory();
-            } else {
-                return;
-            }
+        if (event.getView().getTitle().equals("Gamerules")) {
+
+            //if (event.getCurrentItem().getItemMeta().getDisplayName().equals("Speed")) {}
+            if (event.getCurrentItem().getItemMeta().getLore().get(0).equals("Enabled")) { Main.autoSmelt = false;
+            } else { Main.autoSmelt = true; }
             event.setCancelled(true);
+            Main.selectInv(player, "gameruleInv");
         }
     }
     public static void changeGamemode(Player player, String gamemode) {
         player.closeInventory();
         message.global("Gamemode set to $l" + gamemode);
-        //Main.gamemode = gamemode
-        // or something to that effect
+        Main.gamemode = gamemode;
     }
 }
 

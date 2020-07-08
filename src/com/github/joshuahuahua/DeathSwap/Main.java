@@ -6,6 +6,7 @@ import com.github.joshuahuahua.DeathSwap.listeners.onDeath;
 import com.github.joshuahuahua.DeathSwap.listeners.onJoin;
 import com.github.joshuahuahua.DeathSwap.listeners.onLeave;
 import com.github.joshuahuahua.DeathSwap.listeners.playerClickInventory;
+import com.github.joshuahuahua.DeathSwap.listeners.AutoSmelt;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,13 +28,14 @@ public class Main extends JavaPlugin {
 
     // VARS
     // Time should be seconds + minutes + hours
-    int time = 60;
+    int time = 5*60;
     static int timer;
     static int countDown;
     int secondsRemaining;
     public static boolean isRunning;
     public static Player host = null;
     public static List<Player> lobby = new ArrayList<>();
+    public static String gamemode = "Default";
 
     public static boolean autoSmelt = false;
 
@@ -46,6 +48,7 @@ public class Main extends JavaPlugin {
         pluginManager.registerEvents(new onDeath(this), this);
         pluginManager.registerEvents(new onLeave(this), this);
         pluginManager.registerEvents(new playerClickInventory(), this);
+        pluginManager.registerEvents(new AutoSmelt(this), this);
 
 
 
@@ -107,6 +110,7 @@ public class Main extends JavaPlugin {
                 message.sender(sender,"$6/ds leave: $fLeaves current lobby");
                 message.sender(sender,"$6/ds start: $fStarts DeathSwap match");
                 message.sender(sender,"$6/ds stop: $fStops DeathSwap match");
+                message.sender(sender,"$6/ds query: $fReturns swap time remaining");
                 return true;
             }
 
@@ -147,11 +151,15 @@ public class Main extends JavaPlugin {
             //############################## /ds join ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("join")) {
                 if (host != null) {
-                    if (!lobby.contains((Player) sender)) {
-                        lobby.add((Player) sender);
-                        message.global("$a$l" + sender.getName() + " $r$7has joined the lobby!");
+                    if (!isRunning) {
+                        if (!lobby.contains((Player) sender)) {
+                            lobby.add((Player) sender);
+                            message.global("$a$l" + sender.getName() + " $r$7has joined the lobby!");
+                        } else {
+                            message.sender(sender,"$cYou are already in a lobby!");
+                        }
                     } else {
-                        message.sender(sender,"$cYou are already in a lobby!");
+                        message.sender(sender,"$cThere is already a game in progress!");
                     }
                 } else {
                     message.sender(sender,"$cThere are no available lobbies!");
@@ -171,6 +179,7 @@ public class Main extends JavaPlugin {
                     message.sender(sender,"$cYou are not in a lobby!");
                     message.sender(sender,"Use /ds create to create one or /ds join to join an existing one!");
                 }
+                return true;
             }
 
             //############################## /ds leave ################################
@@ -237,8 +246,8 @@ public class Main extends JavaPlugin {
                                     player.setHealth(20);
                                     player.setFoodLevel(20);
 
-                                    double playerX = Math.random() * ( 1000 - -1000 );
-                                    double playerY = Math.random() * ( 1000 - -1000 );
+                                    double playerX = Math.random() * ( 10000 - -10000 );
+                                    double playerY = Math.random() * ( 10000 - -10000 );
                                     Location startCoord = new Location(world,playerX,200,playerY);
                                     player.teleport(startCoord);
                                     player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200));
@@ -303,7 +312,27 @@ public class Main extends JavaPlugin {
                 return true;
             }
 
-
+            //############################## /ds query ################################
+            if (args.length == 1 && args[0].equalsIgnoreCase("query")) {
+                if (host != null) {
+                    if (sender.getName().equals(host.getName())) {
+                        if (isRunning) {
+                            if (secondsRemaining > 60) {
+                                message.sender(sender, "Time remaining: " + secondsRemaining/60 + " minutes.");
+                            } else {
+                                message.sender(sender, "Time remaining: " + secondsRemaining + " seconds.");
+                            }
+                        } else {
+                            message.sender(sender,"$cNo active Death Swap!");
+                        }
+                    } else {
+                        message.sender(sender,"$cOnly the host can do that!");
+                    }
+                } else {
+                    message.sender(sender,"$cNo active Death Swap!");
+                }
+                return true;
+            }
 
             message.sender(sender,"$cInvalid command!");
             message.sender(sender,"Use /ds help for a list of available commands.");
@@ -319,7 +348,7 @@ public class Main extends JavaPlugin {
         Bukkit.getScheduler().cancelTask(countDown);
     }
 
-    public ItemStack createItem(Material material, String name, String lore) {
+    public static ItemStack createItem(Material material, String name, String lore) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         ArrayList<String> itemLore = new ArrayList<String>();
@@ -349,7 +378,7 @@ public class Main extends JavaPlugin {
         return item;
     }
 
-    public void selectInv(Player player, String inventory) {
+    public static void selectInv(Player player, String inventory) {
 
         if (inventory.equalsIgnoreCase("gamemodeInv")) {
             Inventory gamemodeInv = Bukkit.createInventory(null, 9, "Gamemodes");
@@ -359,8 +388,6 @@ public class Main extends JavaPlugin {
             gamemodeInv.addItem(createItem(Material.ENDER_EYE, "Blind", "Removes the countdown"));
 
             player.openInventory(gamemodeInv);
-
-
         }
 
         if (inventory.equalsIgnoreCase("gameruleInv")) {
