@@ -22,9 +22,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.*;
 
-
 public class Main extends JavaPlugin {
-
 
     // VARS
     // Time should be seconds + minutes + hours
@@ -37,32 +35,21 @@ public class Main extends JavaPlugin {
     public static List<Player> lobby = new ArrayList<>();
     public static String gamemode = "Default";
 
+
     // Game Rules
-    //public static boolean autoSmelt = false;
-
-
-
     public static HashMap<String, Boolean> getGameRules() {
         HashMap<String, Boolean> gameRules = new HashMap<String, Boolean>();
-
         gameRules.put("autoSmelt", false);
         gameRules.put("speed", false);
         gameRules.put("countDown", true);
-
         return gameRules;
     }
     public static HashMap<String, Boolean> gameRules = Main.getGameRules();
 
 
 
-
-
-
-
-
     @Override
     public void onEnable() {
-
 
         PluginManager pluginManager  = getServer().getPluginManager();
         pluginManager.registerEvents(new OnJoin(this), this);
@@ -70,8 +57,6 @@ public class Main extends JavaPlugin {
         pluginManager.registerEvents(new OnLeave(this), this);
         pluginManager.registerEvents(new PlayerClickInventory(), this);
         pluginManager.registerEvents(new AutoSmelt(this), this);
-
-
 
         //time input should be as follows;
         // 10 == 10 seconds
