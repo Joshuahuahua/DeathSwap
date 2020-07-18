@@ -95,7 +95,7 @@ public class Main extends JavaPlugin {
             }
 
 
-            //################################# /ds reload ################################
+            //################################# /ds test ################################
             if (args.length == 1 && args[0].equalsIgnoreCase("test")) {
                 for (Map.Entry<String, Boolean> gameRule : gameRules.entrySet()) {
                     message.global(gameRule.getKey() + " / " + gameRule.getValue());
