@@ -316,7 +316,7 @@ public class Main extends JavaPlugin {
                                 int divTime = time/60;
                                 message.global("$a$lDeathSwap Started");
                                 for (Player player : lobby) {
-                                    player.sendTitle(ChatColor.translateAlternateColorCodes('$', "$a$lDeathSwap Started"), ChatColor.translateAlternateColorCodes('$',"$aSwap time minutes:$c$l " + divTime), 10,40,10);
+                                    message.title(player,"$a$lDeathSwap Started", "$aSwap time minutes:$c$l " + divTime, 10,40,10);
                                 }
                                 BukkitScheduler scheduler = getServer().getScheduler();
 
@@ -327,7 +327,7 @@ public class Main extends JavaPlugin {
                                     @Override
                                     public void run() {
                                         for (Player player : lobby) {
-                                            player.sendTitle(ChatColor.translateAlternateColorCodes('$', "$b$lSwap!"), "", 5,10,5);
+                                            message.title(player, "$b$lSwap!", "", 5,10,5);
                                         }
                                         Location player1pos = lobby.get(0).getLocation();
                                         int i;

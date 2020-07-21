@@ -19,4 +19,8 @@ public class message {
     public static void player(Player player, String message) {
         player.sendMessage(ChatColor.translateAlternateColorCodes('$',customConfig.get().getString("prefix") + message));
     }
+
+    public static void title(Player player, String title, String subtitle, Integer fadeIn, Integer hold, Integer fadeOut) {
+        player.sendTitle(ChatColor.translateAlternateColorCodes('$', title), ChatColor.translateAlternateColorCodes('$',subtitle), fadeIn,hold,fadeOut);
+    }
 }
