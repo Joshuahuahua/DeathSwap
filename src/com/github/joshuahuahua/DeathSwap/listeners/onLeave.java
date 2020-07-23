@@ -2,13 +2,9 @@ package com.github.joshuahuahua.DeathSwap.listeners;
 
 import com.github.joshuahuahua.DeathSwap.Main;
 import com.github.joshuahuahua.DeathSwap.message;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class OnLeave implements Listener {

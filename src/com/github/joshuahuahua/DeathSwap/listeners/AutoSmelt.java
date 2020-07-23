@@ -1,8 +1,6 @@
 package com.github.joshuahuahua.DeathSwap.listeners;
 
 import com.github.joshuahuahua.DeathSwap.Main;
-import com.github.joshuahuahua.DeathSwap.message;
-import com.mysql.fabric.xmlrpc.base.Array;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
