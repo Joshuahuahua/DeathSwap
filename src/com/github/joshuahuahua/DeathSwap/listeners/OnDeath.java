@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class OnDeath implements Listener {
-
     private final Main plugin;
 
     public OnDeath(Main plugin) {
@@ -42,8 +41,6 @@ public class OnDeath implements Listener {
                 }
             }
         }.runTaskLater(plugin, 5);
-
-
     }
 
     public static void endGame() {
