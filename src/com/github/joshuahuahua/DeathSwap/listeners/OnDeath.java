@@ -5,12 +5,16 @@ import com.github.joshuahuahua.DeathSwap.message;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.File;
+import java.io.IOException;
 
 public class OnDeath implements Listener {
     private final Main plugin;
@@ -59,6 +63,15 @@ public class OnDeath implements Listener {
 
         Main.host = null;
         Main.lobby.clear();
+
+        File file = new File("E:\\Users\\Joshua\\Google Drive\\1.16 Server\\world\\advancements");           //file to be delete
+        try {
+            FileUtils.deleteDirectory(file);
+            message.global("$aAdvancements reset");
+        } catch (IOException e) {
+            message.global("#cAdvancements could not be reset");
+        }
+        Bukkit.reload();
     }
 
 }

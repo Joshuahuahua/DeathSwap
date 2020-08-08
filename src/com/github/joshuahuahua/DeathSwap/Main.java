@@ -10,6 +10,7 @@ import com.github.joshuahuahua.DeathSwap.listeners.AutoSmelt;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +21,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Main extends JavaPlugin {
@@ -100,6 +103,25 @@ public class Main extends JavaPlugin {
                 for (Map.Entry<String, Boolean> gameRule : gameRules.entrySet()) {
                     message.global(gameRule.getKey() + " / " + gameRule.getValue());
                 }
+                return true;
+            }
+
+
+            //################################# /ds achReset ################################
+            if (args.length == 1 && args[0].equalsIgnoreCase("achReset")) {
+                /*
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    player.kickPlayer("Achievements have been reset");
+                }
+                 */
+                File file = new File("E:\\Users\\Joshua\\Google Drive\\1.16 Server\\world\\advancements");           //file to be delete
+                try {
+                    FileUtils.deleteDirectory(file);
+                    message.global("$aAdvancements reset");
+                } catch (IOException e) {
+                    message.global("#cAdvancements could not be reset");
+                }
+                Bukkit.reload();
                 return true;
             }
 
