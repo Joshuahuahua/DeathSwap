@@ -328,11 +328,18 @@ public class Main extends JavaPlugin {
                                     gameRuleInit(player);
 
 
-                                    double playerX = Math.random() * ( 10000 - -10000 );
-                                    double playerY = Math.random() * ( 10000 - -10000 );
-                                    Location startCoord = new Location(world,playerX,200,playerY);
-                                    player.teleport(startCoord);
-                                    player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200, false,false,false));
+                                    while (true) {
+                                        double playerX = Math.random() * ( 10000 - -1*10000 );
+                                        double playerZ = Math.random() * ( 10000 - -1*10000 );
+                                        double playerY = world.getHighestBlockAt((int) playerX,(int) playerZ).getY();
+                                        Location rtpLocation = new Location(world,playerX,playerY,playerZ);
+                                        if (world.getBlockAt(rtpLocation).getType() != Material.WATER) {
+                                            Location startCoord = new Location(world,playerX,200,playerY);
+                                            player.teleport(startCoord);
+                                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,8*20,200, false,false,false));
+                                            break;
+                                        }
+                                    }
                                 }
 
                                 int divTime = time/60;
